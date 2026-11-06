@@ -1,0 +1,6 @@
+# Run with: cloudflared tunnel --config tunnel.yml run
+tunnel: fb6d1947-d761-405c-8df1-7fc147fdf50c
+ingress:
+  - hostname: api.empanadas.travel
+    service: http://localhost:8000
+  - service: http_status:404
