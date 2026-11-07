@@ -25,6 +25,7 @@ from pathlib import Path, PurePosixPath
 import duckdb
 import openpyxl
 
+from .inventory import build_inventory
 from .verify import run_checks
 
 SOURCE_DIRS = ("data", "tasks")
@@ -289,6 +290,7 @@ def build(root: Path, db_path: Path) -> bool:
         load_all(con, root, manifest)
         load_data_dictionary(con, root)
         create_staging(con)
+        build_inventory(con, root)
 
         print("Checking")
         failures = run_checks(con, root, manifest)
@@ -297,6 +299,9 @@ def build(root: Path, db_path: Path) -> bool:
             [str(uuid.uuid4()), package["package"], package["version"], duckdb.__version__,
              str(root), started, utc_now()],
         )
+        if not failures:
+            submission = db_path.with_name("A2_inventory_2025_submission.csv")
+            con.execute(f"COPY (SELECT * FROM inv.a2_submission) TO {lit(submission)} (HEADER)")
     finally:
         con.close()
 

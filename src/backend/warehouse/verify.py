@@ -10,6 +10,8 @@ import json
 from datetime import date
 from pathlib import Path
 
+from .inventory.checks import inventory_checks
+
 # (name, child table, child column, parent key query)
 REFERENCES = [
     ("erp.material_id", "erp_purchase_lines_2021_2025", "material_id", "SELECT material_id FROM raw.materials"),
@@ -159,6 +161,8 @@ def run_checks(con, root: Path, manifest: dict[str, str]) -> int:
         """).fetchone()
         record("orphan_keys", name, True, 0, orphans[0], f"{orphans[1]} distinct values",
                status="info")
+
+    inventory_checks(con, root, manifest, record)
 
     summary = con.execute(
         "SELECT status, count(*) FROM meta.check_result GROUP BY 1 ORDER BY 1").fetchall()
