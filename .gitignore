@@ -11,3 +11,6 @@ wheels/
 
 # Secrets
 .env
+
+# Built database (rebuild with `uv run apetit-warehouse`)
+/data/
